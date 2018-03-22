@@ -9,11 +9,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Callback;
 
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String TAG = "STITCHING";
 
     private ImageView left, right, merged;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +46,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         right = (ImageView)findViewById(R.id.iv_right);
         merged = (ImageView)findViewById(R.id.iv_merged);
 
+        fab = (FloatingActionButton)findViewById(R.id.fab);
+
         left.setOnClickListener(this);
         right.setOnClickListener(this);
         merged.setOnClickListener(this);
+        fab.setOnClickListener(this);
     }
 
     public Bitmap combineImage(){
@@ -117,17 +123,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         combineImage(leftBitmap, rightBitmap);
     }
 
+//    private void combineImage(Bitmap leftBitmap, Bitmap rightBitmap){
+//        Bitmap bitmapCombined = null;
+//
+//        int width, height = 0;
+//
+//        if(leftBitmap.getWidth() > rightBitmap.getWidth()) {
+//            width = leftBitmap.getWidth() + rightBitmap.getWidth();
+//            height = leftBitmap.getHeight();
+//        } else {
+//            width = rightBitmap.getWidth() + rightBitmap.getWidth();
+//            height = leftBitmap.getHeight();
+//        }
+//
+//        bitmapCombined = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//
+//        Canvas comboImage = new Canvas(bitmapCombined);
+//
+//        comboImage.drawBitmap(leftBitmap, 0f, 0f, null);
+//        comboImage.drawBitmap(rightBitmap, leftBitmap.getWidth(), 0f, null);
+//
+//        String tmpImg = String.valueOf(System.currentTimeMillis()) + ".png";
+//
+//        File direct = new File(Environment.getExternalStorageDirectory() + "/stitch");
+//
+//        if (!direct.exists()) {
+//            File wallpaperDirectory = new File("/sdcard/stitch/");
+//            wallpaperDirectory.mkdirs();
+//        }
+//
+//        File file = new File(new File("/sdcard/stitch/"), tmpImg);
+//        if (file.exists()) {
+//            file.delete();
+//        }
+//
+//
+//        OutputStream os = null;
+//        try {
+//            os = new FileOutputStream(file);
+//            bitmapCombined.compress(Bitmap.CompressFormat.PNG, 100, os);
+//        } catch(IOException e) {
+//          Log.e(TAG, "problem combining images", e);
+//        }
+//
+//        merged.setImageBitmap(bitmapCombined);
+//    }
+
     private void combineImage(Bitmap leftBitmap, Bitmap rightBitmap){
         Bitmap bitmapCombined = null;
 
         int width, height = 0;
 
-        if(leftBitmap.getWidth() > rightBitmap.getWidth()) {
-            width = leftBitmap.getWidth() + rightBitmap.getWidth();
-            height = leftBitmap.getHeight();
+//        if(leftBitmap.getWidth() > rightBitmap.getWidth()) {
+//            width = leftBitmap.getWidth() + rightBitmap.getWidth();
+//            height = leftBitmap.getHeight();
+//        } else {
+//            width = rightBitmap.getWidth() + rightBitmap.getWidth();
+//            height = leftBitmap.getHeight();
+//        }
+
+        if (leftBitmap.getHeight() > rightBitmap.getHeight()) {
+            height = leftBitmap.getHeight() + rightBitmap.getHeight();
+            width = leftBitmap.getWidth();
         } else {
-            width = rightBitmap.getWidth() + rightBitmap.getWidth();
-            height = leftBitmap.getHeight();
+            height = rightBitmap.getHeight() + rightBitmap.getHeight();
+            width = leftBitmap.getWidth();
         }
 
         bitmapCombined = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -135,7 +195,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Canvas comboImage = new Canvas(bitmapCombined);
 
         comboImage.drawBitmap(leftBitmap, 0f, 0f, null);
-        comboImage.drawBitmap(rightBitmap, leftBitmap.getWidth(), 0f, null);
+//        comboImage.drawBitmap(rightBitmap, leftBitmap.getWidth(), 0f, null);
+        comboImage.drawBitmap(rightBitmap, 0f, leftBitmap.getHeight() / 2, null);
 
         String tmpImg = String.valueOf(System.currentTimeMillis()) + ".png";
 
@@ -157,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             os = new FileOutputStream(file);
             bitmapCombined.compress(Bitmap.CompressFormat.PNG, 100, os);
         } catch(IOException e) {
-          Log.e(TAG, "problem combining images", e);
+            Log.e(TAG, "problem combining images", e);
         }
 
         merged.setImageBitmap(bitmapCombined);
@@ -175,6 +236,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.iv_merged:
                 mergeImage();
+                break;
+            case R.id.fab:
+                Toast.makeText(this, "FAB Clicked", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, CameraActivity.class));
                 break;
         }
     }
