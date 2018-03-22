@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         left.setOnClickListener(this);
         right.setOnClickListener(this);
+        merged.setOnClickListener(this);
     }
 
     public Bitmap combineImage(){
@@ -82,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             ImageView view = requestCode == LEFT_IMAGE_REQUEST_CODE ? left : right;
 
-            PicassoSingleton.getInstance().getPicasso().load(data.getData()).into(view, new Callback() {
+            PicassoSingleton.getInstance().getPicasso().load(data.getData()).fit().into(view, new Callback() {
                 @Override
                 public void onSuccess() {
                     Log.d(TAG, "Success");
@@ -104,12 +107,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void mergeImage(){
+        Bitmap leftBitmap = ((BitmapDrawable)left.getDrawable()).getBitmap();
+        Bitmap rightBitmap = ((BitmapDrawable)right.getDrawable()).getBitmap();
+        combineImage(leftBitmap, rightBitmap);
+    }
+
+    private void combineImage(Bitmap leftBitmap, Bitmap rightBitmap){
+        Bitmap bitmapCombined = null;
+
+        int width, height = 0;
+
+        if(leftBitmap.getWidth() > rightBitmap.getWidth()) {
+            width = leftBitmap.getWidth() + rightBitmap.getWidth();
+            height = leftBitmap.getHeight();
+        } else {
+            width = rightBitmap.getWidth() + rightBitmap.getWidth();
+            height = leftBitmap.getHeight();
+        }
+
+        bitmapCombined = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas comboImage = new Canvas(bitmapCombined);
+
+        comboImage.drawBitmap(leftBitmap, 0f, 0f, null);
+        comboImage.drawBitmap(rightBitmap, leftBitmap.getWidth(), 0f, null);
+
+
+        merged.setImageBitmap(bitmapCombined);
+    }
+
     @Override
     public void onClick(View v) {
-        if (v == left) {
-            getImage(LEFT_IMAGE_REQUEST_CODE);
-        } else if (v == right) {
-            getImage(RIGHT_IMAGE_REQUEST_CODE);
+
+        switch (v.getId()){
+            case R.id.iv_left:
+                getImage(LEFT_IMAGE_REQUEST_CODE);
+                break;
+            case R.id.iv_right:
+                getImage(RIGHT_IMAGE_REQUEST_CODE);
+                break;
+            case R.id.iv_merged:
+                mergeImage();
+                break;
         }
     }
 }
