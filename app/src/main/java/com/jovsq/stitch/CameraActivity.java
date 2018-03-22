@@ -254,10 +254,10 @@ public class CameraActivity extends AppCompatActivity {
                          * Passing on the cropped image path to the Result Activity
                          */
                         //TODO process result
-//                        Intent i = new Intent(CameraActivity.this, ResultActivity.class);
-//                        i.putExtra(ResultActivity.EXTRA_FILEPATH, pictureFile.getAbsolutePath());
-//                        startActivity(i);
-//                        finish();
+                        Intent i = new Intent(CameraActivity.this, ResultsActivity.class);
+                        i.putExtra(ResultsActivity.EXTRA_FILEPATH, pictureFile.getAbsolutePath());
+                        startActivity(i);
+                        finish();
                     } else {
                         Toast.makeText(CameraActivity.this, "Failed to capture. Please try again!", Toast.LENGTH_SHORT).show();
                     }
