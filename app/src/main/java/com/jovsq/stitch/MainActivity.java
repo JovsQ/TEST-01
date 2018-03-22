@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +17,10 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -133,6 +137,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         comboImage.drawBitmap(leftBitmap, 0f, 0f, null);
         comboImage.drawBitmap(rightBitmap, leftBitmap.getWidth(), 0f, null);
 
+        String tmpImg = String.valueOf(System.currentTimeMillis()) + ".png";
+
+        File direct = new File(Environment.getExternalStorageDirectory() + "/stitch");
+
+        if (!direct.exists()) {
+            File wallpaperDirectory = new File("/sdcard/stitch/");
+            wallpaperDirectory.mkdirs();
+        }
+
+        File file = new File(new File("/sdcard/stitch/"), tmpImg);
+        if (file.exists()) {
+            file.delete();
+        }
+
+
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            bitmapCombined.compress(Bitmap.CompressFormat.PNG, 100, os);
+        } catch(IOException e) {
+          Log.e(TAG, "problem combining images", e);
+        }
 
         merged.setImageBitmap(bitmapCombined);
     }
